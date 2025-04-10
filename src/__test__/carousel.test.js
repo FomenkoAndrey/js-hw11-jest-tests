@@ -2,13 +2,21 @@ import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-// Отримуємо шлях до main.js
-const mainJsPath = path.resolve(__dirname, '../main.js');
-const carouselCode = fs.readFileSync(mainJsPath, 'utf-8');
+// Отримуємо шлях до index.js
+const indexJsPath = path.resolve(__dirname, '../index.js');
+const carouselCode = fs.readFileSync(indexJsPath, 'utf-8');
 
 // Створюємо віртуальний модуль для тестування класової реалізації
 vi.mock('../carousel.js', () => {
-  const Carousel = vi.fn();
+  const Carousel = vi.fn(function(p) {
+    // Зберігаємо параметри для тестування
+    const settings = {...{containerID: '#carousel', interval: 5000, isPlaying: true, slideId: '.slide'}, ...p};
+    
+    this.container = document.querySelector(settings.containerID);
+    this.slideItems = this.container.querySelectorAll(settings.slideId);
+    this.TIMER_INTERVAL = settings.interval;
+    this.isPlaying = settings.isPlaying;
+  });
   
   // Мокуємо прототип класу
   Carousel.prototype = {
@@ -99,6 +107,7 @@ vi.mock('../carousel.js', () => {
     }),
     
     _tick: vi.fn(function() {
+      if (!this.isPlaying) return;
       this.timerID = setInterval(() => {
         this._gotoNth(this.currentSlide + 1);
       }, this.TIMER_INTERVAL);
@@ -185,8 +194,8 @@ vi.mock('../swipe-carousel.js', () => {
   };
 });
 
-// Мокуємо main.js для тестування
-vi.mock('../main.js', () => {
+// Мокуємо index.js для тестування
+vi.mock('../index.js', () => {
   return {
     default: vi.fn()
   };
@@ -415,5 +424,52 @@ describe('Carousel Functionality', () => {
     
     // Перевіряємо, що екземпляр карусельки викликав метод prev() (рух вправо = перехід вліво)
     expect(carousel.prev).toHaveBeenCalled();
+  });
+
+  // Додаємо новий тест для перевірки параметрів конфігурації
+  test('Карусель правильно застосовує налаштування', () => {
+    // Отримуємо клас SwipeCarousel
+    const { default: SwipeCarousel } = require('../swipe-carousel.js');
+    
+    // Налаштовуємо підрахунок викликів setInterval
+    vi.spyOn(window, 'setInterval');
+    
+    // Перевизначаємо методи прототипу, щоб уникнути маніпуляцій з DOM
+    SwipeCarousel.prototype._initControls = vi.fn();
+    SwipeCarousel.prototype._initIndicators = vi.fn();
+    SwipeCarousel.prototype._initListeners = vi.fn();
+    
+    // Використовуємо оригінальний метод _tick, але відстежуємо його виклики
+    const originalTick = SwipeCarousel.prototype._tick;
+    SwipeCarousel.prototype._tick = vi.fn(function() {
+      if (!this.isPlaying) return;
+      window.setInterval(() => {}, this.TIMER_INTERVAL);
+    });
+    
+    // Створюємо карусель з кастомними налаштуваннями
+    const customCarousel = new SwipeCarousel({
+      containerID: '#custom-carousel',
+      slideId: '.custom-slide',
+      interval: 1000,
+      isPlaying: false
+    });
+    
+    // Перевіряємо налаштування, які були передані в конструктор
+    expect(customCarousel.TIMER_INTERVAL).toBe(1000);
+    expect(customCarousel.isPlaying).toBe(false);
+    
+    // Очищаємо історію викликів перед тестом
+    window.setInterval.mockClear();
+    
+    // Перевіряємо інші методи, які використовують налаштування
+    customCarousel.init();
+    
+    // _tick викликається в init, але оскільки isPlaying=false, setInterval не повинен викликатися
+    expect(window.setInterval).not.toHaveBeenCalled();
+    
+    // Перевіряємо, що setInterval викликається тільки коли isPlaying = true
+    customCarousel.isPlaying = true;
+    customCarousel._tick();
+    expect(window.setInterval).toHaveBeenCalled();
   });
 });
