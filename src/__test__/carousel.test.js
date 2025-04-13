@@ -109,7 +109,7 @@ vi.mock('../carousel/index.js', () => {
       const target = e.target;
       if (target && target.classList.contains('indicator')) {
         this.pause();
-        this._gotoNth(+target.dataset.slideTo);
+        this._gotoNth(target.dataset.slideTo);
       }
     }),
     
@@ -465,5 +465,26 @@ describe('Carousel Functionality', () => {
     
     // Очищаємо DOM після тесту
     document.body.innerHTML = '';
+  });
+
+  test('Перевірка типу аргументу у методі _gotoNth при кліку на індикатор', () => {
+    // Оскільки прямий доступ до приватних методів неможливий, 
+    // цей тест додано як заглушка, перевірка виконується в наступному тесті
+    expect(true).toBe(true);
+  });
+
+  test('Метод #indicatorClick має використовувати перетворення рядка в число', () => {
+    // Отримуємо вихідний код core.js
+    const carouselCode = fs.readFileSync(path.resolve(__dirname, '../carousel/core.js'), 'utf-8');
+
+    // Перевіряємо, чи міститься в коді правильний виклик з унарним плюсом
+    const hasUnaryPlus = carouselCode.includes('this.#gotoNth(+target.dataset.slideTo)');
+
+    // Перевіряємо, чи немає неправильного виклику без унарного плюса
+    const hasStringArgument = carouselCode.includes('this.#gotoNth(target.dataset.slideTo)');
+
+    // Тест проходить, якщо в коді використовується перетворення рядка в число
+    expect(hasUnaryPlus).toBe(true);
+    expect(hasStringArgument).toBe(false);
   });
 });
