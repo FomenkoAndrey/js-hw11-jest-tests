@@ -11,3 +11,10 @@ export { default as SwipeCarousel } from './swipe.js'
 
 // Default export is the SwipeCarousel which has all functionality
 export { default } from './swipe.js'
+
+// Альтернативний варіант експорту для простішої реалізації каруселі:
+// Експортуємо обидва класи з одного файлу, щоб зменшити кількість імпортів у проєкті.
+// Іменований експорт (Carousel, SwipeCarousel) дає змогу явно звертатися до потрібного компонента,
+// а експорт за замовчуванням (SwipeCarousel) спрощує імпорт для найпоширенішого сценарію використання.
+// export { Carousel, SwipeCarousel };
+// export default SwipeCarousel;
