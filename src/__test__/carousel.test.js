@@ -467,7 +467,7 @@ describe('Carousel Functionality', () => {
     document.body.innerHTML = '';
   });
 
-  test('Перехід через індикатори передає числовий аргумент у _gotoNth', () => {
+  test('Перехід між слайдами через індикатори має працювати з числовими індексами', () => {
     // Оскільки прямий доступ до приватних методів неможливий, 
     // перевіряємо це через мок-об'єкт
     
@@ -519,12 +519,7 @@ describe('Carousel Functionality', () => {
     }).not.toThrow();
   });
 
-  test('Метод #indicatorClick має використовувати перетворення рядка в число', () => {
-    // Цей тест просто перевіряє, що тести проходять
-    expect(true).toBe(true);
-  });
-
-  test('Файл core.js містить конвертацію типів у методі #indicatorClick', () => {
+  test('Аргументи при переході між слайдами коректно передаються', () => {
     // Отримуємо вихідний код core.js
     const carouselCode = fs.readFileSync(path.resolve(__dirname, '../carousel/core.js'), 'utf-8');
 
@@ -537,5 +532,26 @@ describe('Carousel Functionality', () => {
     // Тест проходить, якщо в коді використовується перетворення рядка в число
     expect(hasUnaryPlus).toBe(true);
     expect(hasStringArgument).toBe(false);
+  });
+
+  test('Обчислення індексу наступного слайду має працювати коректно при будь-якій кількості слайдів', () => {
+    // Отримуємо вихідний код core.js
+    const carouselCode = fs.readFileSync(path.resolve(__dirname, '../carousel/core.js'), 'utf-8');
+    
+    // Шукаємо рядок, де відбувається обчислення наступного слайду
+    const correctPattern = /this\.#currentSlide\s*=\s*\(n\s*\+\s*this\.#SLIDES_COUNT\)\s*%\s*this\.#SLIDES_COUNT/;
+    
+    // Шукаємо неправильні патерни з конкретними числами
+    const wrongPattern1 = /this\.#currentSlide\s*=\s*\(n\s*\+\s*this\.#SLIDES_COUNT\)\s*%\s*\d+/;
+    const wrongPattern2 = /this\.#currentSlide\s*=\s*\(n\s*\+\s*\d+\)\s*%\s*this\.#SLIDES_COUNT/;
+    const wrongPattern3 = /this\.#currentSlide\s*=\s*\(n\s*\+\s*\d+\)\s*%\s*\d+/;
+    
+    // Перевіряємо наявність правильного патерну
+    expect(correctPattern.test(carouselCode)).toBe(true);
+    
+    // Переконуємося, що неправильні патерни відсутні
+    expect(wrongPattern1.test(carouselCode)).toBe(false);
+    expect(wrongPattern2.test(carouselCode)).toBe(false);
+    expect(wrongPattern3.test(carouselCode)).toBe(false);
   });
 });
