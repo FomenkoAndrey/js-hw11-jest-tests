@@ -7,7 +7,6 @@ const carouselConfig = {
   isPlaying: true,
 }
 
-
 const carousel = new SwipeCarousel(carouselConfig)
 
 carousel.init()

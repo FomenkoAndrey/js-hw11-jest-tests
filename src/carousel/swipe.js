@@ -12,16 +12,16 @@ class SwipeCarousel extends Carousel {
   #swipeThreshold
   #isDragging = false
 
-  constructor(p) {
+  constructor(options) {
     // Додаємо додаткові налаштування для swipe функціональності
     const swipeSettings = {
       ...DEFAULT_SETTINGS,
       swipeThreshold: 100, // Мінімальна відстань свайпу для зміни слайда
-      ...p
+      ...options
     }
 
     super(swipeSettings)
-    this.slidesContainer = this.slideItems[0]?.parentElement
+    this.slidesContainer = this.slides[0]?.parentElement
     this.#swipeThreshold = swipeSettings.swipeThreshold
   }
 
@@ -64,7 +64,7 @@ class SwipeCarousel extends Carousel {
    * Handle mouse leave event
    * Cancels the swipe when mouse leaves the element
    */
-  #handleMouseLeave() {
+  #mouseLeave() {
     this.#isDragging = false
   }
 
@@ -87,7 +87,7 @@ class SwipeCarousel extends Carousel {
     this.slidesContainer.addEventListener('mouseup', this.#swipeEnd.bind(this))
 
     // Обробляємо вихід курсора за межі елемента
-    this.slidesContainer.addEventListener('mouseleave', this.#handleMouseLeave.bind(this))
+    this.slidesContainer.addEventListener('mouseleave', this.#mouseLeave.bind(this))
   }
 }
 

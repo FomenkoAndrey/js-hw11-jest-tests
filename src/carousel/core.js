@@ -32,14 +32,14 @@ class Carousel {
   #FA_PREV
   #FA_NEXT
 
-  constructor(p) {
+  constructor(options) {
     const settings = {
       ...DEFAULT_SETTINGS,
-      ...p
+      ...options
     }
 
     this.container = document.querySelector(settings.containerId)
-    this.slideItems = this.container.querySelectorAll(settings.slideId)
+    this.slides = this.container.querySelectorAll(settings.slideId)
     this.TIMER_INTERVAL = settings.interval
     this.isPlaying = settings.isPlaying
     this.pauseOnHover = settings.pauseOnHover
@@ -50,7 +50,7 @@ class Carousel {
   #initProps() {
     this.#currentSlide = 0
 
-    this.#SLIDES_COUNT = this.slideItems.length
+    this.#SLIDES_COUNT = this.slides.length
     this.#CODE_SPACE = KEYS.SPACE
     this.#CODE_LEFT_ARROW = KEYS.LEFT_ARROW
     this.#CODE_RIGHT_ARROW = KEYS.RIGHT_ARROW
@@ -110,11 +110,11 @@ class Carousel {
   }
 
   #initListeners() {
-    document.addEventListener('keydown', this.#pressKey.bind(this))
+    document.addEventListener('keydown', this.#keydown.bind(this))
     this.#pauseBtn.addEventListener('click', this.pausePlay.bind(this))
     this.#nextBtn.addEventListener('click', this.next.bind(this))
     this.#prevBtn.addEventListener('click', this.prev.bind(this))
-    this.#indicatorsContainer.addEventListener('click', this.#indicateHandler.bind(this))
+    this.#indicatorsContainer.addEventListener('click', this.#indicatorClick.bind(this))
 
     // Додаємо слухачі подій наведення миші тільки якщо опція pauseOnHover увімкнена
     if (this.pauseOnHover) {
@@ -126,10 +126,10 @@ class Carousel {
   /* ========== PRIVATE NAVIGATION METHODS ========== */
 
   #gotoNth(n) {
-    this.slideItems[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
+    this.slides[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
     this.#indicatorItems[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
     this.#currentSlide = (n + this.#SLIDES_COUNT) % this.#SLIDES_COUNT
-    this.slideItems[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
+    this.slides[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
     this.#indicatorItems[this.#currentSlide].classList.toggle(CSS_CLASSES.ACTIVE)
   }
 
@@ -143,7 +143,7 @@ class Carousel {
 
   /* ========== PRIVATE EVENT HANDLERS ========== */
 
-  #indicateHandler(e) {
+  #indicatorClick(e) {
     let target = e.target
 
     if (target && target.matches(`li.${CSS_CLASSES.INDICATOR}`)) {
@@ -152,7 +152,7 @@ class Carousel {
     }
   }
 
-  #pressKey(e) {
+  #keydown(e) {
     // Перевіряємо, чи натиснута клавіша використовується карусельою
     const isCarouselKey = [this.#CODE_LEFT_ARROW, this.#CODE_RIGHT_ARROW, this.#CODE_SPACE].includes(e.code)
 
