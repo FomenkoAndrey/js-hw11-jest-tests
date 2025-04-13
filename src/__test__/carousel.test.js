@@ -14,7 +14,7 @@ vi.mock('../carousel/index.js', () => {
     const settings = {...{containerId: '#carousel', interval: 5000, isPlaying: true, slideId: '.slide', pauseOnHover: false}, ...p};
     
     this.container = document.querySelector(settings.containerId);
-    this.slideItems = this.container.querySelectorAll(settings.slideId);
+    this.slides = this.container.querySelectorAll(settings.slideId);
     this.TIMER_INTERVAL = settings.interval;
     this.isPlaying = settings.isPlaying;
     this.pauseOnHover = settings.pauseOnHover;
@@ -32,7 +32,7 @@ vi.mock('../carousel/index.js', () => {
     
     _initProps: vi.fn(function() {
       this.currentSlide = 0;
-      this.SLIDES_COUNT = this.slideItems.length;
+      this.SLIDES_COUNT = this.slides.length;
       this.CODE_SPACE = 'Space';
       this.CODE_LEFT_ARROW = 'ArrowLeft';
       this.CODE_RIGHT_ARROW = 'ArrowRight';
@@ -155,7 +155,7 @@ vi.mock('../carousel/index.js', () => {
   const SwipeCarousel = vi.fn(function(options) {
     // Викликаємо конструктор базового класу
     Carousel.call(this, options);
-    this.slidesContainer = this.slideItems[0]?.parentElement;
+    this.slidesContainer = this.slides[0]?.parentElement;
     this.startPosX = null;
     this.endPosX = null;
     this.swipeThreshold = options.swipeThreshold || 100;
@@ -246,7 +246,7 @@ describe('Carousel Functionality', () => {
     
     // Зберігаємо необхідні властивості
     carousel.container = document.querySelector('#carousel');
-    carousel.slideItems = carousel.container.querySelectorAll('.slide');
+    carousel.slides = carousel.container.querySelectorAll('.slide');
     carousel.TIMER_INTERVAL = 2000;
     carousel.isPlaying = true;
     carousel.startPosX = null;
