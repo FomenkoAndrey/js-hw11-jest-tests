@@ -136,13 +136,23 @@ describe('Carousel Functionality', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowLeft', bubbles: true }));
     expect(slides[0].classList.contains('active')).toBe(true);
 
-    // Перевіряємо, що preventDefault викликається при натисканні пробілу
+    // Перевіряємо пробіл
     const spaceEvent = new KeyboardEvent('keydown', { code: 'Space', bubbles: true });
     const preventDefaultSpy = vi.spyOn(spaceEvent, 'preventDefault');
+    
+    // Шпигуємо за методом pausePlay
+    const pausePlaySpy = vi.spyOn(carousel, 'pausePlay');
+    
+    // Викликаємо подію пробілу
     document.dispatchEvent(spaceEvent);
+
+    // Перевіряємо, що preventDefault викликано
     expect(preventDefaultSpy).toHaveBeenCalled();
 
-    // Перевіряємо, що clearInterval викликається при натисканні пробілу
+    // Перевіряємо, що pausePlay викликано після натискання пробілу
+    expect(pausePlaySpy).toHaveBeenCalled();
+    
+    // Перевіряємо, що clearInterval викликано після паузи
     expect(window.clearInterval).toHaveBeenCalled();
   });
 
