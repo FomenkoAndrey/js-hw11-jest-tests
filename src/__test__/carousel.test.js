@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { SwipeCarousel } from '../carousel/index.js';
 
 // Отримуємо шлях до main.js
 const mainJsPath = path.resolve(__dirname, '../main.js');
@@ -235,8 +236,6 @@ describe('Carousel Functionality', () => {
     vi.spyOn(window, 'clearInterval');
 
     // Імпортуємо мок-класи
-    const { default: SwipeCarousel } = require('../carousel/index.js');
-    
     // Створюємо екземпляр карусельки
     carousel = new SwipeCarousel({
       containerId: '#carousel',
@@ -418,9 +417,6 @@ describe('Carousel Functionality', () => {
         <div class="custom-slide"></div>
       </div>
     `;
-    
-    // Отримуємо клас SwipeCarousel
-    const { default: SwipeCarousel } = require('../carousel/index.js');
     
     // Налаштовуємо підрахунок викликів setInterval
     vi.spyOn(window, 'setInterval');
