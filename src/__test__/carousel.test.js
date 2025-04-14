@@ -539,37 +539,46 @@ describe('Carousel Functionality', () => {
   test('Карусель коректно обробляє неіснуючі елементи', () => {
     // Очищаємо DOM
     document.body.innerHTML = '';
-    
+
     // Перевіряємо створення каруселі з неіснуючим контейнером
-    // Обгортаємо весь блок з ініціалізацією та викликом методів у try-catch,
-    // оскільки конструктор може викликати помилку при доступі до null.container
+    let carousel;
     try {
-      const invalidCarousel = new SwipeCarousel({
-        containerId: '#non-existent-carousel',
+      carousel = new SwipeCarousel({
+        containerId: '#non-existent-container',
         slideId: '.slide',
         interval: 1000
       });
-      
-      // Викликаємо методи лише якщо конструктор не викинув помилку
-      if (invalidCarousel) {
-        invalidCarousel.next();
-        invalidCarousel.prev();
-        invalidCarousel.play();
-        invalidCarousel.pause();
-      }
     } catch (error) {
-      // Очікуємо помилку, але не даємо їй зламати тест
-      console.log('Очікувана помилка при роботі з неіснуючими елементами:', error.message);
+      expect(error).toBeInstanceOf(TypeError); // Очікуємо TypeError
     }
-    
-    // Тест пройдено, якщо виконання продовжується після потенційних помилок
-    expect(true).toBe(true);
+
+    // Перевіряємо, що carousel не створено
+    expect(carousel).toBeUndefined();
+
+    // Перевіряємо створення валідної каруселі після невдалої спроби
+    document.body.innerHTML = `
+      <div id="test-carousel">
+        <div class="slides">
+          <div class="slide active"></div>
+          <div class="slide"></div>
+        </div>
+      </div>
+    `;
+
+    const validCarousel = new SwipeCarousel({
+      containerId: '#test-carousel',
+      slideId: '.slide',
+      interval: 1000
+    });
+
+    expect(() => validCarousel.init()).not.toThrow();
+    expect(validCarousel.container).not.toBeNull();
+    expect(validCarousel.slides.length).toBe(2);
   });
 
-  test('Індикатори коректно обробляють невалідні значення', () => {
-    // Налаштування DOM для тесту
+  test('Індикатори коректно обробляють валідні та невалідні значення', () => {
     document.body.innerHTML = `
-      <div id="valid-indicators-carousel">
+      <div id="carousel">
         <div class="slides">
           <div class="slide active"></div>
           <div class="slide"></div>
@@ -579,53 +588,59 @@ describe('Carousel Functionality', () => {
           <li class="indicator active" data-slide-to="0"></li>
           <li class="indicator" data-slide-to="1"></li>
           <li class="indicator" data-slide-to="2"></li>
+          <li class="indicator" data-slide-to="invalid"></li>
         </ol>
       </div>
     `;
-    
-    // Створюємо карусель з валідними індикаторами
+
     const carousel = new SwipeCarousel({
-      containerId: '#valid-indicators-carousel',
+      containerId: '#carousel',
       slideId: '.slide',
-      interval: 1000
+      interval: 1000,
+      isPlaying: false
     });
-    
-    // Ініціалізуємо карусель
     carousel.init();
-    
-    // Отримуємо індикатори та слайди
-    const indicators = document.querySelectorAll('#valid-indicators-carousel .indicator');
-    const slides = document.querySelectorAll('#valid-indicators-carousel .slide');
-    
-    // Перевіряємо початковий стан - перший слайд активний
+
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.indicator');
+
     expect(slides[0].classList.contains('active')).toBe(true);
     expect(indicators[0].classList.contains('active')).toBe(true);
-    
-    // Клікаємо на другий індикатор
-    indicators[1].click(); // data-slide-to="1"
-    
-    // Перевіряємо, що другий слайд став активним
+
+    indicators[1].click();
     expect(slides[1].classList.contains('active')).toBe(true);
-    expect(indicators[1].classList.contains('active')).toBe(true);
     expect(slides[0].classList.contains('active')).toBe(false);
+    expect(indicators[1].classList.contains('active')).toBe(true);
     expect(indicators[0].classList.contains('active')).toBe(false);
-    
-    // Клікаємо на третій індикатор
-    indicators[2].click(); // data-slide-to="2"
-    
-    // Перевіряємо, що третій слайд став активним
+
+    indicators[2].click();
     expect(slides[2].classList.contains('active')).toBe(true);
-    expect(indicators[2].classList.contains('active')).toBe(true);
     expect(slides[1].classList.contains('active')).toBe(false);
+    expect(indicators[2].classList.contains('active')).toBe(true);
     expect(indicators[1].classList.contains('active')).toBe(false);
-    
-    // Повертаємося до першого слайду
-    indicators[0].click(); // data-slide-to="0"
-    
-    // Перевіряємо, що перший слайд знову став активним
-    expect(slides[0].classList.contains('active')).toBe(true);
-    expect(indicators[0].classList.contains('active')).toBe(true);
-    expect(slides[2].classList.contains('active')).toBe(false);
-    expect(indicators[2].classList.contains('active')).toBe(false);
+
+    // Мокуємо console.error
+    const originalConsoleError = console.error;
+    console.error = vi.fn();
+
+    // Перехоплюємо помилку через глобальний обробник
+    const errorHandler = vi.fn();
+    window.addEventListener('error', errorHandler);
+
+    const clickEvent = new MouseEvent('click', {
+      bubbles: true,
+      cancelable: true
+    });
+
+    indicators[3].dispatchEvent(clickEvent);
+
+    expect(document.querySelector('.slide.active')).toBeNull();
+    expect(carousel).toBeDefined();
+    expect(errorHandler).toHaveBeenCalledWith(expect.objectContaining({
+      error: expect.any(TypeError)
+    }));
+
+    window.removeEventListener('error', errorHandler);
+    console.error = originalConsoleError;
   });
 });
