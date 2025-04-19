@@ -54,10 +54,10 @@ class Carousel {
     this.#CODE_SPACE = KEYS.SPACE
     this.#CODE_LEFT_ARROW = KEYS.LEFT_ARROW
     this.#CODE_RIGHT_ARROW = KEYS.RIGHT_ARROW
-    this.#FA_PAUSE = '<i class="fas fa-pause-circle"></i>'
-    this.#FA_PLAY = '<i class="fas fa-play-circle"></i>'
-    this.#FA_PREV = '<i class="fas fa-angle-left"></i>'
-    this.#FA_NEXT = '<i class="fas fa-angle-right"></i>'
+    this.#FA_PAUSE = '<i class="fas fa-pause"></i>'
+    this.#FA_PLAY = '<i class="fas fa-play"></i>'
+    this.#FA_PREV = '<i class="fas fa-chevron-left"></i>'
+    this.#FA_NEXT = '<i class="fas fa-chevron-right"></i>'
   }
 
   #initControls() {
