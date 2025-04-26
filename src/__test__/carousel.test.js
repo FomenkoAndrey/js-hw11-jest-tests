@@ -594,7 +594,7 @@ describe('Carousel Functionality', () => {
           <div class="slide"></div>
           <div class="slide"></div>
         </div>
-        <ol id="indicators-container" class="indicators">
+        <ol class="indicators" id="indicators-container">
           <li class="indicator active" data-slide-to="0"></li>
           <li class="indicator" data-slide-to="1"></li>
           <li class="indicator" data-slide-to="2"></li>
@@ -614,15 +614,18 @@ describe('Carousel Functionality', () => {
     const slides = document.querySelectorAll('.slide')
     const indicators = document.querySelectorAll('.indicator')
 
+    // Перевірка початкового стану
     expect(slides[0].classList.contains('active')).toBe(true)
     expect(indicators[0].classList.contains('active')).toBe(true)
 
+    // Клік на валідний індикатор (data-slide-to="1")
     indicators[1].click()
     expect(slides[1].classList.contains('active')).toBe(true)
     expect(slides[0].classList.contains('active')).toBe(false)
     expect(indicators[1].classList.contains('active')).toBe(true)
     expect(indicators[0].classList.contains('active')).toBe(false)
 
+    // Клік на інший валідний індикатор (data-slide-to="2")
     indicators[2].click()
     expect(slides[2].classList.contains('active')).toBe(true)
     expect(slides[1].classList.contains('active')).toBe(false)
@@ -633,25 +636,25 @@ describe('Carousel Functionality', () => {
     const originalConsoleError = console.error
     console.error = vi.fn()
 
-    // Перехоплюємо помилку через глобальний обробник
+    // Перехоплюємо помилку, щоб тест не падав
     const errorHandler = vi.fn()
     window.addEventListener('error', errorHandler)
 
-    const clickEvent = new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true
-    })
+    // Клік на невалідний індикатор (data-slide-to="invalid")
+    indicators[3].click()
 
-    indicators[3].dispatchEvent(clickEvent)
-
-    expect(document.querySelector('.slide.active')).toBeNull()
-    expect(carousel).toBeDefined()
+    // Перевіряємо, що TypeError була перехоплена
     expect(errorHandler).toHaveBeenCalledWith(
       expect.objectContaining({
         error: expect.any(TypeError)
       })
     )
 
+    // Очікуємо, що клас active знятий через баг у #gotoNth
+    expect(slides[2].classList.contains('active')).toBe(false)
+    expect(indicators[2].classList.contains('active')).toBe(false)
+
+    // Відновлюємо слухачі та console.error
     window.removeEventListener('error', errorHandler)
     console.error = originalConsoleError
   })

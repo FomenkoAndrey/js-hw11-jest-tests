@@ -108,6 +108,7 @@ class Carousel {
     console.log('ID selector:', this.container.querySelector(`#${ELEMENT_IDS.INDICATORS_CONTAINER}`))
     console.log('Class selector:', this.container.querySelector(`.${CSS_CLASSES.INDICATORS}`))
 
+    // this.#indicatorsContainer = this.container.querySelector(`.${CSS_CLASSES.INDICATORS}`)
     this.#indicatorsContainer = this.container.querySelector(`#${ELEMENT_IDS.INDICATORS_CONTAINER}`)
     this.#indicatorItems = this.container.querySelectorAll(`.${CSS_CLASSES.INDICATOR}`)
   }
