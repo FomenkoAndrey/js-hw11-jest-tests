@@ -109,7 +109,7 @@ class Carousel {
     this.#indicatorItems = this.container.querySelectorAll(`.${CSS_CLASSES.INDICATOR}`)
   }
 
-  #initListeners() {
+  #initEventListeners() {
     document.addEventListener('keydown', this.#keydown.bind(this))
     this.#pauseBtn.addEventListener('click', this.pausePlay.bind(this))
     this.#nextBtn.addEventListener('click', this.next.bind(this))
@@ -220,7 +220,7 @@ class Carousel {
     this.#initProps()
     this.#initControls()
     this.#initIndicators()
-    this.#initListeners()
+    this.#initEventListeners()
     this.#tick()
   }
 }
