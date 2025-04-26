@@ -40,6 +40,7 @@ export const CSS_CLASSES = {
  * DOM Element IDs
  */
 export const ELEMENT_IDS = {
+  INDICATORS_CONTAINER: 'indicators-container',
   PAUSE_BTN: 'pause-btn',
   PREV_BTN: 'prev-btn',
   NEXT_BTN: 'next-btn',
