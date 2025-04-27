@@ -4,7 +4,7 @@ const carouselConfig = {
   containerId: '#carousel',
   slideId: '.slide',
   interval: 3000,
-  isPlaying: true,
+  isPlaying: true
 }
 
 const carousel = new SwipeCarousel(carouselConfig)
@@ -12,4 +12,3 @@ const carousel = new SwipeCarousel(carouselConfig)
 carousel.init()
 
 export default carousel
-
