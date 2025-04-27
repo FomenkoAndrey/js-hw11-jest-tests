@@ -14,6 +14,15 @@ vi.mock('../main.js', () => {
   }
 })
 
+// Додаю функцію для читання коду carousel з core.js або index.js
+function getCarouselSource() {
+  const corePath = path.resolve(__dirname, '../carousel/core.js')
+  if (fs.existsSync(corePath)) {
+    return fs.readFileSync(corePath, 'utf-8')
+  }
+  return fs.readFileSync(path.resolve(__dirname, '../carousel/index.js'), 'utf-8')
+}
+
 // Налаштування DOM перед тестами
 function setupDOM() {
   document.body.innerHTML = `
@@ -398,8 +407,7 @@ describe('Carousel Functionality', () => {
   })
 
   test('Аргументи при переході між слайдами коректно передаються', () => {
-    // Отримуємо вихідний код core.js
-    const carouselCode = fs.readFileSync(path.resolve(__dirname, '../carousel/core.js'), 'utf-8')
+    const carouselCode = getCarouselSource()
 
     // Перевіряємо, чи міститься в коді правильний виклик з унарним плюсом
     const hasUnaryPlus = carouselCode.includes('this.#gotoNth(+target.dataset.slideTo)')
@@ -413,8 +421,7 @@ describe('Carousel Functionality', () => {
   })
 
   test('Обчислення індексу наступного слайду має працювати коректно при будь-якій кількості слайдів', () => {
-    // Отримуємо вихідний код core.js
-    const carouselCode = fs.readFileSync(path.resolve(__dirname, '../carousel/core.js'), 'utf-8')
+    const carouselCode = getCarouselSource()
 
     // Шукаємо рядок, де відбувається обчислення наступного слайду
     const correctPattern = /this\.#currentSlide\s*=\s*\(n\s*\+\s*this\.#SLIDES_COUNT\)\s*%\s*this\.#SLIDES_COUNT/
